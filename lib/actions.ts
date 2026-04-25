@@ -21,10 +21,12 @@ export async function upsertCategoria(formData: FormData) {
   const nombre = (formData.get('nombre') as string).trim()
   const orden = parseInt(formData.get('orden') as string, 10) || 0
   const activa = formData.get('activa') === 'true'
+  const modo = (formData.get('modo') as string) || 'resto'
 
   if (!nombre) return { error: 'El nombre es requerido' }
+  if (!['resto', 'takeaway', 'ambos'].includes(modo)) return { error: 'Modo inválido' }
 
-  const payload = { nombre, orden, activa }
+  const payload = { nombre, orden, activa, modo }
 
   const { error } = id
     ? await supabase.from('categorias').update(payload).eq('id', id)
@@ -34,6 +36,8 @@ export async function upsertCategoria(formData: FormData) {
 
   revalidatePath('/admin/categorias')
   revalidatePath('/menu')
+  revalidatePath('/menu/resto')
+  revalidatePath('/menu/takeaway')
   return { success: true }
 }
 
@@ -54,6 +58,8 @@ export async function deleteCategoria(id: string) {
 
   revalidatePath('/admin/categorias')
   revalidatePath('/menu')
+  revalidatePath('/menu/resto')
+  revalidatePath('/menu/takeaway')
   return { success: true }
 }
 
@@ -68,6 +74,8 @@ export async function toggleCategoriaActiva(id: string, activa: boolean) {
 
   revalidatePath('/admin/categorias')
   revalidatePath('/menu')
+  revalidatePath('/menu/resto')
+  revalidatePath('/menu/takeaway')
   return { success: true }
 }
 
@@ -86,11 +94,28 @@ export async function upsertItem(formData: FormData) {
   const disponible = formData.get('disponible') === 'true'
   const orden = parseInt(formData.get('orden') as string, 10) || 0
 
+  // Precio alternativo (opcional)
+  const precioAltInput = formData.get('precio_alternativo') as string
+  const precio_alternativo = precioAltInput ? Math.round(parseFloat(precioAltInput) * 100) : null
+  const etiqueta_precio = (formData.get('etiqueta_precio') as string)?.trim() || null
+  const etiqueta_precio_alt = (formData.get('etiqueta_precio_alt') as string)?.trim() || null
+
   if (!nombre) return { error: 'El nombre es requerido' }
   if (!categoria_id) return { error: 'La categoría es requerida' }
   if (isNaN(precio) || precio < 0) return { error: 'El precio no es válido' }
 
-  const payload = { nombre, descripcion, precio, categoria_id, imagen_url, disponible, orden }
+  const payload = {
+    nombre,
+    descripcion,
+    precio,
+    precio_alternativo,
+    etiqueta_precio,
+    etiqueta_precio_alt,
+    categoria_id,
+    imagen_url,
+    disponible,
+    orden,
+  }
 
   const { data, error } = id
     ? await supabase.from('items').update(payload).eq('id', id).select('id').single()
@@ -100,6 +125,8 @@ export async function upsertItem(formData: FormData) {
 
   revalidatePath('/admin/items')
   revalidatePath('/menu')
+  revalidatePath('/menu/resto')
+  revalidatePath('/menu/takeaway')
   return { success: true, id: data?.id }
 }
 
@@ -110,6 +137,8 @@ export async function deleteItem(id: string) {
 
   revalidatePath('/admin/items')
   revalidatePath('/menu')
+  revalidatePath('/menu/resto')
+  revalidatePath('/menu/takeaway')
   return { success: true }
 }
 
@@ -124,5 +153,7 @@ export async function toggleDisponible(id: string, disponible: boolean) {
 
   revalidatePath('/admin/items')
   revalidatePath('/menu')
+  revalidatePath('/menu/resto')
+  revalidatePath('/menu/takeaway')
   return { success: true }
 }

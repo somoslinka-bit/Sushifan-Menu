@@ -1,14 +1,20 @@
 import { createSupabaseServerClient } from './supabaseServer'
 import type { Categoria, Item } from '@/types'
 
-export async function getCategorias(): Promise<Categoria[]> {
+export async function getCategorias(modo?: 'resto' | 'takeaway'): Promise<Categoria[]> {
   const supabase = await createSupabaseServerClient()
-  const { data, error } = await supabase
+
+  let query = supabase
     .from('categorias')
     .select('*')
     .eq('activa', true)
     .order('orden', { ascending: true })
 
+  if (modo) {
+    query = query.or(`modo.eq.${modo},modo.eq.ambos`)
+  }
+
+  const { data, error } = await query
   if (error) throw error
   return data ?? []
 }

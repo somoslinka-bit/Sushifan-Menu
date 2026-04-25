@@ -3,14 +3,20 @@
 import { useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 
-export default function QRGenerator() {
+interface QRCardProps {
+  label: string
+  sublabel: string
+  path: string
+  filename: string
+}
+
+function QRCard({ label, sublabel, path, filename }: QRCardProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleDownload = () => {
     const svgEl = containerRef.current?.querySelector('svg')
     if (!svgEl) return
 
-    // Tamaño de exportación
     const size = 600
     const padding = 40
     const logoHeight = 60
@@ -21,22 +27,18 @@ export default function QRGenerator() {
     canvas.height = totalHeight
     const ctx = canvas.getContext('2d')!
 
-    // Fondo oscuro
     ctx.fillStyle = '#1A1A1A'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    // Logo texto
     ctx.fillStyle = '#C9A84C'
     ctx.font = 'bold 48px Georgia, serif'
     ctx.textAlign = 'center'
-    ctx.letterSpacing = '8px'
     ctx.fillText('SUSHIFAN', canvas.width / 2, padding + 44)
 
     ctx.fillStyle = '#888888'
     ctx.font = '14px Arial, sans-serif'
-    ctx.fillText('wine bar', canvas.width / 2, padding + 66)
+    ctx.fillText(`wine bar — ${label}`, canvas.width / 2, padding + 66)
 
-    // Línea decorativa
     const lineY = padding + 80
     const grad = ctx.createLinearGradient(padding, lineY, canvas.width - padding, lineY)
     grad.addColorStop(0, 'transparent')
@@ -49,7 +51,6 @@ export default function QRGenerator() {
     ctx.lineTo(canvas.width - padding * 2, lineY)
     ctx.stroke()
 
-    // Serializar SVG a imagen
     const svgData = new XMLSerializer().serializeToString(svgEl)
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
     const svgUrl = URL.createObjectURL(svgBlob)
@@ -60,7 +61,7 @@ export default function QRGenerator() {
       ctx.drawImage(img, padding, qrY, size, size)
 
       const link = document.createElement('a')
-      link.download = 'sushifan-qr.png'
+      link.download = filename
       link.href = canvas.toDataURL('image/png')
       link.click()
       URL.revokeObjectURL(svgUrl)
@@ -68,26 +69,29 @@ export default function QRGenerator() {
     img.src = svgUrl
   }
 
+  const url = typeof window !== 'undefined'
+    ? `${window.location.origin}${path}`
+    : `https://sushifan.com${path}`
+
   return (
-    <div className="flex flex-col items-center gap-6 max-w-sm">
-      {/* Preview */}
+    <div className="flex flex-col items-center gap-4 w-full max-w-xs">
       <div
-        className="bg-[#111] border border-[var(--border)] rounded-2xl p-8 flex flex-col items-center gap-4 w-full"
+        className="bg-[#111] border border-[var(--border)] rounded-2xl p-6 flex flex-col items-center gap-4 w-full"
         style={{ boxShadow: '0 0 40px rgba(201,168,76,0.08)' }}
       >
         <div className="text-center">
-          <p className="font-bebas text-3xl tracking-[0.15em] text-[var(--accent)]">SUSHIFAN</p>
-          <p className="font-inter text-xs tracking-[0.3em] text-[var(--muted)] uppercase">wine bar</p>
-          <div className="golden-divider mt-2 max-w-[120px] mx-auto" />
+          <p className="font-bebas text-2xl tracking-[0.15em] text-[var(--accent)]">SUSHIFAN</p>
+          <p className="font-inter text-xs tracking-[0.3em] text-[var(--muted)] uppercase">
+            {sublabel}
+          </p>
+          <div className="golden-divider mt-2 max-w-[100px] mx-auto" />
+          <p className="font-bebas text-lg tracking-widest text-white mt-2">{label}</p>
         </div>
 
-        <div
-          ref={containerRef}
-          className="bg-white p-3 rounded-xl"
-        >
+        <div ref={containerRef} className="bg-white p-3 rounded-xl">
           <QRCodeSVG
-            value={typeof window !== 'undefined' ? `${window.location.origin}/menu` : 'https://sushifan.com/menu'}
-            size={200}
+            value={url}
+            size={180}
             bgColor="#ffffff"
             fgColor="#1A1A1A"
             level="H"
@@ -108,12 +112,31 @@ export default function QRGenerator() {
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
-        Descargar PNG para imprimir
+        Descargar PNG
       </button>
 
       <p className="text-xs text-[var(--muted)] font-inter text-center">
-        El QR apunta a <span className="text-[var(--accent)]">/menu</span> — actualizá la URL en producción si el dominio cambia.
+        Apunta a <span className="text-[var(--accent)]">{path}</span>
       </p>
+    </div>
+  )
+}
+
+export default function QRGenerator() {
+  return (
+    <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+      <QRCard
+        label="Restó"
+        sublabel="wine bar"
+        path="/menu/resto"
+        filename="sushifan-qr-resto.png"
+      />
+      <QRCard
+        label="Takeaway"
+        sublabel="wine bar"
+        path="/menu/takeaway"
+        filename="sushifan-qr-takeaway.png"
+      />
     </div>
   )
 }

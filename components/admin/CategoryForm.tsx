@@ -5,10 +5,22 @@ import { upsertCategoria, deleteCategoria, toggleCategoriaActiva } from '@/lib/a
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
-import type { Categoria } from '@/types'
+import type { Categoria, Modo } from '@/types'
 
 interface CategoryManagerProps {
   categorias: Categoria[]
+}
+
+const MODO_LABELS: Record<Modo, string> = {
+  resto: 'Restó',
+  takeaway: 'Takeaway',
+  ambos: 'Restó + Takeaway',
+}
+
+const MODO_COLORS: Record<Modo, string> = {
+  resto: 'bg-blue-500/20 text-blue-400',
+  takeaway: 'bg-purple-500/20 text-purple-400',
+  ambos: 'bg-[var(--accent)]/20 text-[var(--accent)]',
 }
 
 export default function CategoryManager({ categorias }: CategoryManagerProps) {
@@ -70,6 +82,31 @@ export default function CategoryManager({ categorias }: CategoryManagerProps) {
         min="0"
         defaultValue={cat?.orden ?? categorias.length}
       />
+
+      {/* Selector de modo */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-inter text-[var(--muted)]">Menú</label>
+        <div className="grid grid-cols-3 gap-2">
+          {(['resto', 'takeaway', 'ambos'] as Modo[]).map((m) => (
+            <label
+              key={m}
+              className="flex flex-col items-center gap-1 cursor-pointer"
+            >
+              <input
+                type="radio"
+                name="modo"
+                value={m}
+                defaultChecked={(cat?.modo ?? 'resto') === m}
+                className="sr-only peer"
+              />
+              <div className="w-full text-center border border-[var(--border)] rounded-lg py-2 px-1 text-xs font-inter text-[var(--muted)] peer-checked:border-[var(--accent)] peer-checked:text-[var(--accent)] peer-checked:bg-[var(--accent)]/10 transition-all cursor-pointer">
+                {MODO_LABELS[m]}
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <input type="hidden" name="activa" value={cat?.activa !== false ? 'true' : 'false'} />
 
       {error && (
@@ -116,6 +153,10 @@ export default function CategoryManager({ categorias }: CategoryManagerProps) {
               <p className="text-sm font-inter font-medium text-white">{cat.nombre}</p>
               <p className="text-xs text-[var(--muted)]">Orden: {cat.orden}</p>
             </div>
+
+            <span className={`text-xs font-inter px-2 py-0.5 rounded-full ${MODO_COLORS[cat.modo ?? 'resto']}`}>
+              {MODO_LABELS[cat.modo ?? 'resto']}
+            </span>
 
             <span
               className={`text-xs font-inter px-2 py-0.5 rounded-full ${

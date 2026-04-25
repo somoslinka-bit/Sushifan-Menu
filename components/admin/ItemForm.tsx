@@ -18,6 +18,7 @@ export default function ItemForm({ item, categorias, onSuccess, onCancel }: Item
   const [isPending, startTransition] = useTransition()
   const [imagenUrl, setImagenUrl] = useState<string>(item?.imagen_url ?? '')
   const [error, setError] = useState<string | null>(null)
+  const [tienePrecioDual, setTienePrecioDual] = useState(item?.precio_alternativo != null)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -25,6 +26,13 @@ export default function ItemForm({ item, categorias, onSuccess, onCancel }: Item
     const formData = new FormData(e.currentTarget)
     formData.set('imagen_url', imagenUrl)
     if (item?.id) formData.set('id', item.id)
+
+    // Si no tiene precio dual, limpiar los campos
+    if (!tienePrecioDual) {
+      formData.delete('precio_alternativo')
+      formData.set('etiqueta_precio', '')
+      formData.set('etiqueta_precio_alt', '')
+    }
 
     startTransition(async () => {
       const result = await upsertItem(formData)
@@ -68,6 +76,7 @@ export default function ItemForm({ item, categorias, onSuccess, onCancel }: Item
         />
       </div>
 
+      {/* Precio principal */}
       <div className="grid grid-cols-2 gap-3">
         <Input
           label="Precio (pesos) *"
@@ -89,6 +98,53 @@ export default function ItemForm({ item, categorias, onSuccess, onCancel }: Item
           defaultValue={item?.orden ?? 0}
         />
       </div>
+
+      {/* Toggle precio dual */}
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="precio_dual"
+          checked={tienePrecioDual}
+          onChange={(e) => setTienePrecioDual(e.target.checked)}
+          className="accent-[var(--accent)] w-4 h-4"
+        />
+        <label htmlFor="precio_dual" className="text-sm font-inter text-white">
+          Tiene dos precios (ej: 4P. / 8P.)
+        </label>
+      </div>
+
+      {/* Campos de precio dual */}
+      {tienePrecioDual && (
+        <div className="border border-[var(--border)] rounded-xl p-3 flex flex-col gap-3 bg-[var(--background)]">
+          <p className="text-xs text-[var(--muted)] font-inter">
+            Ejemplo: &quot;4P.&quot; / $10.000 — &quot;8P.&quot; / $17.000
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Etiqueta 1 (ej: 4P.)"
+              name="etiqueta_precio"
+              defaultValue={item?.etiqueta_precio ?? ''}
+              placeholder="4P."
+            />
+            <Input
+              label="Precio alternativo *"
+              name="precio_alternativo"
+              type="number"
+              step="1"
+              min="0"
+              defaultValue={item?.precio_alternativo != null ? item.precio_alternativo / 100 : ''}
+              placeholder="17000"
+              required={tienePrecioDual}
+            />
+          </div>
+          <Input
+            label="Etiqueta 2 (ej: 8P.)"
+            name="etiqueta_precio_alt"
+            defaultValue={item?.etiqueta_precio_alt ?? ''}
+            placeholder="8P."
+          />
+        </div>
+      )}
 
       <div className="flex flex-col gap-1">
         <label htmlFor="categoria_id" className="text-sm font-inter text-[var(--muted)]">

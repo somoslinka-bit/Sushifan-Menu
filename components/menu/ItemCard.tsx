@@ -8,6 +8,8 @@ interface ItemCardProps {
 }
 
 export default function ItemCard({ item, index }: ItemCardProps) {
+  const tienePrecioDual = item.precio_alternativo != null
+
   return (
     <div
       className="item-enter flex items-center gap-4 py-4 border-b border-[var(--border)] last:border-0"
@@ -54,9 +56,28 @@ export default function ItemCard({ item, index }: ItemCardProps) {
             {item.descripcion}
           </p>
         )}
-        <p className="font-inter font-semibold text-[var(--accent)] text-base mt-1.5">
-          {formatPrecio(item.precio)}
-        </p>
+
+        {tienePrecioDual ? (
+          <p className="font-inter font-semibold text-[var(--accent)] text-base mt-1.5">
+            {item.etiqueta_precio && (
+              <span className="text-[var(--muted)] font-normal text-sm mr-1">
+                {item.etiqueta_precio}
+              </span>
+            )}
+            {formatPrecio(item.precio)}
+            <span className="text-[var(--muted)] font-normal mx-1.5">/</span>
+            {item.etiqueta_precio_alt && (
+              <span className="text-[var(--muted)] font-normal text-sm mr-1">
+                {item.etiqueta_precio_alt}
+              </span>
+            )}
+            {formatPrecio(item.precio_alternativo!)}
+          </p>
+        ) : (
+          <p className="font-inter font-semibold text-[var(--accent)] text-base mt-1.5">
+            {formatPrecio(item.precio)}
+          </p>
+        )}
       </div>
     </div>
   )
