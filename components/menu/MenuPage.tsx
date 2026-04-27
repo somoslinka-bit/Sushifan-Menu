@@ -3,15 +3,21 @@
 import { useState, useEffect, useCallback } from 'react'
 import CategoryNav from './CategoryNav'
 import CategorySection from './CategorySection'
+import TakeawayCart from './TakeawayCart'
 import type { Categoria, Item } from '@/types'
 
 interface MenuPageProps {
   categorias: Categoria[]
   itemsPorCategoria: Record<string, Item[]>
+  modo: string
 }
 
-export default function MenuPage({ categorias, itemsPorCategoria }: MenuPageProps) {
+export default function MenuPage({ categorias, itemsPorCategoria, modo }: MenuPageProps) {
   const [activeId, setActiveId] = useState(categorias[0]?.id ?? '')
+  const [cart, setCart] = useState<Record<string, number>>({})
+
+  const esTakeaway = modo === 'takeaway'
+  const allItems = Object.values(itemsPorCategoria).flat()
 
   const handleScroll = useCallback(() => {
     const sections = categorias
@@ -33,6 +39,30 @@ export default function MenuPage({ categorias, itemsPorCategoria }: MenuPageProp
     return () => window.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
 
+  const handleAdd = useCallback((item: Item) => {
+    setCart((prev) => ({ ...prev, [item.id]: (prev[item.id] ?? 0) + 1 }))
+  }, [])
+
+  const handleRemove = useCallback((itemId: string) => {
+    setCart((prev) => {
+      const next = { ...prev }
+      if ((next[itemId] ?? 0) <= 1) {
+        delete next[itemId]
+      } else {
+        next[itemId] -= 1
+      }
+      return next
+    })
+  }, [])
+
+  const handleClear = useCallback(() => {
+    setCart({})
+  }, [])
+
+  const cartProps = esTakeaway
+    ? { cart, onAdd: handleAdd, onRemove: handleRemove }
+    : undefined
+
   return (
     <div>
       <CategoryNav
@@ -46,10 +76,16 @@ export default function MenuPage({ categorias, itemsPorCategoria }: MenuPageProp
             key={cat.id}
             categoria={cat}
             items={itemsPorCategoria[cat.id] ?? []}
+            cartProps={cartProps}
           />
         ))}
-        <div className="h-16" />
+        {/* Espacio para que el botón flotante no tape el último ítem */}
+        <div className={esTakeaway ? 'h-28' : 'h-16'} />
       </main>
+
+      {esTakeaway && (
+        <TakeawayCart cart={cart} items={allItems} onClear={handleClear} />
+      )}
     </div>
   )
 }

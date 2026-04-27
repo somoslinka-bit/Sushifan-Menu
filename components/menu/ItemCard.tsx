@@ -5,10 +5,15 @@ import type { Item } from '@/types'
 interface ItemCardProps {
   item: Item
   index: number
+  cantidad?: number
+  onAdd?: () => void
+  onRemove?: () => void
 }
 
-export default function ItemCard({ item, index }: ItemCardProps) {
+export default function ItemCard({ item, index, cantidad, onAdd, onRemove }: ItemCardProps) {
   const tienePrecioDual = item.precio_alternativo != null
+  const esTakeaway = onAdd !== undefined
+  const agotado = !item.disponible
 
   return (
     <div
@@ -37,7 +42,7 @@ export default function ItemCard({ item, index }: ItemCardProps) {
             </div>
           )}
         </div>
-        {!item.disponible && (
+        {agotado && (
           <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center">
             <span className="text-[10px] font-inter font-semibold text-white uppercase tracking-wider leading-tight text-center px-1">
               Agotado
@@ -79,6 +84,42 @@ export default function ItemCard({ item, index }: ItemCardProps) {
           </p>
         )}
       </div>
+
+      {/* Controles takeaway */}
+      {esTakeaway && (
+        <div className="flex-shrink-0 flex items-center">
+          {!cantidad || cantidad === 0 ? (
+            <button
+              onClick={onAdd}
+              disabled={agotado}
+              className="w-9 h-9 rounded-full border-2 border-[var(--accent)] flex items-center justify-center text-[var(--accent)] text-xl font-light transition-all active:scale-90 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[var(--accent)] hover:text-black"
+              aria-label={`Agregar ${item.nombre}`}
+            >
+              +
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onRemove}
+                className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--muted)] text-lg font-light transition-all active:scale-90 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                aria-label={`Quitar ${item.nombre}`}
+              >
+                −
+              </button>
+              <span className="font-bebas text-xl text-white w-5 text-center leading-none">
+                {cantidad}
+              </span>
+              <button
+                onClick={onAdd}
+                className="w-8 h-8 rounded-full border border-[var(--accent)] flex items-center justify-center text-[var(--accent)] text-lg font-light transition-all active:scale-90 hover:bg-[var(--accent)] hover:text-black"
+                aria-label={`Agregar otro ${item.nombre}`}
+              >
+                +
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

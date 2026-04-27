@@ -67,7 +67,7 @@ export default async function MenuModoPage({ params }: Props) {
           </p>
         </div>
       ) : (
-        <MenuPage categorias={categorias} itemsPorCategoria={itemsPorCategoria} />
+        <MenuPage categorias={categorias} itemsPorCategoria={itemsPorCategoria} modo={modo} />
       )}
     </div>
   )

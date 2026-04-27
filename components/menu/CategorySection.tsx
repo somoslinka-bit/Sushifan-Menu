@@ -1,12 +1,19 @@
 import ItemCard from './ItemCard'
 import type { Categoria, Item } from '@/types'
 
+interface CartProps {
+  cart: Record<string, number>
+  onAdd: (item: Item) => void
+  onRemove: (itemId: string) => void
+}
+
 interface CategorySectionProps {
   categoria: Categoria
   items: Item[]
+  cartProps?: CartProps
 }
 
-export default function CategorySection({ categoria, items }: CategorySectionProps) {
+export default function CategorySection({ categoria, items, cartProps }: CategorySectionProps) {
   if (items.length === 0) return null
 
   return (
@@ -19,7 +26,14 @@ export default function CategorySection({ categoria, items }: CategorySectionPro
       </div>
       <div className="px-4">
         {items.map((item, index) => (
-          <ItemCard key={item.id} item={item} index={index} />
+          <ItemCard
+            key={item.id}
+            item={item}
+            index={index}
+            cantidad={cartProps?.cart[item.id]}
+            onAdd={cartProps ? () => cartProps.onAdd(item) : undefined}
+            onRemove={cartProps ? () => cartProps.onRemove(item.id) : undefined}
+          />
         ))}
       </div>
     </section>
