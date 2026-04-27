@@ -13,6 +13,7 @@ interface Props {
 const LABELS: Record<string, string> = {
   resto: 'Restó',
   takeaway: 'Takeaway',
+  vinos: 'Carta de Vinos',
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -27,10 +28,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MenuModoPage({ params }: Props) {
   const { modo } = await params
 
-  if (modo !== 'resto' && modo !== 'takeaway') notFound()
+  if (modo !== 'resto' && modo !== 'takeaway' && modo !== 'vinos') notFound()
 
   const [categorias, items] = await Promise.all([
-    getCategorias(modo),
+    getCategorias(modo as 'resto' | 'takeaway' | 'vinos'),
     getItems(),
   ])
 

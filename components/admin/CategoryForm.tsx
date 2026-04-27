@@ -14,12 +14,14 @@ interface CategoryManagerProps {
 const MODO_LABELS: Record<Modo, string> = {
   resto: 'Restó',
   takeaway: 'Takeaway',
+  vinos: 'Carta de Vinos',
   ambos: 'Restó + Takeaway',
 }
 
 const MODO_COLORS: Record<Modo, string> = {
   resto: 'bg-blue-500/20 text-blue-400',
   takeaway: 'bg-purple-500/20 text-purple-400',
+  vinos: 'bg-rose-500/20 text-rose-400',
   ambos: 'bg-[var(--accent)]/20 text-[var(--accent)]',
 }
 
@@ -86,8 +88,8 @@ export default function CategoryManager({ categorias }: CategoryManagerProps) {
       {/* Selector de modo */}
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-inter text-[var(--muted)]">Menú</label>
-        <div className="grid grid-cols-3 gap-2">
-          {(['resto', 'takeaway', 'ambos'] as Modo[]).map((m) => (
+        <div className="grid grid-cols-2 gap-2">
+          {(['resto', 'takeaway', 'vinos', 'ambos'] as Modo[]).map((m) => (
             <label
               key={m}
               className="flex flex-col items-center gap-1 cursor-pointer"

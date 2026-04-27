@@ -6,12 +6,14 @@ import type { Item, Modo } from '@/types'
 const MODO_LABELS: Record<Modo, string> = {
   resto: 'Restó',
   takeaway: 'Takeaway',
+  vinos: 'Vinos',
   ambos: 'Ambos',
 }
 
 const MODO_COLORS: Record<Modo, string> = {
   resto: 'bg-blue-500/20 text-blue-400',
   takeaway: 'bg-purple-500/20 text-purple-400',
+  vinos: 'bg-rose-500/20 text-rose-400',
   ambos: 'bg-[var(--accent)]/20 text-[var(--accent)]',
 }
 

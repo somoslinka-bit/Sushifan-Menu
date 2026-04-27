@@ -1,4 +1,4 @@
-export type Modo = 'resto' | 'takeaway' | 'ambos'
+export type Modo = 'resto' | 'takeaway' | 'vinos' | 'ambos'
 
 export interface Categoria {
   id: string

@@ -124,7 +124,7 @@ function QRCard({ label, sublabel, path, filename }: QRCardProps) {
 
 export default function QRGenerator() {
   return (
-    <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+    <div className="flex flex-col lg:flex-row gap-8 items-start justify-center flex-wrap">
       <QRCard
         label="Restó"
         sublabel="wine bar"
@@ -136,6 +136,12 @@ export default function QRGenerator() {
         sublabel="wine bar"
         path="/menu/takeaway"
         filename="sushifan-qr-takeaway.png"
+      />
+      <QRCard
+        label="Carta de Vinos"
+        sublabel="wine bar"
+        path="/menu/vinos"
+        filename="sushifan-qr-vinos.png"
       />
     </div>
   )

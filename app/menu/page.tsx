@@ -20,9 +20,8 @@ export default function MenuLanding() {
         <div className="golden-divider mt-4 max-w-[160px] mx-auto" />
       </div>
 
-      {/* Selector */}
       <p className="font-inter text-sm text-[var(--muted)] tracking-widest uppercase mb-8">
-        ¿Cómo vas a pedir?
+        ¿Qué querés ver?
       </p>
 
       <div className="flex flex-col gap-4 w-full max-w-xs">
@@ -47,6 +46,18 @@ export default function MenuLanding() {
           </span>
           <span className="font-inter text-xs text-[var(--muted)]">
             Para llevar
+          </span>
+        </Link>
+
+        <Link
+          href="/menu/vinos"
+          className="group flex flex-col items-center gap-1 border border-[var(--border)] rounded-2xl py-6 px-4 text-center transition-all hover:border-[var(--accent)] hover:bg-[var(--accent)]/5 active:scale-[0.97]"
+        >
+          <span className="font-bebas text-3xl tracking-widest text-white">
+            Carta de Vinos
+          </span>
+          <span className="font-inter text-xs text-[var(--muted)]">
+            Tintos, blancos y espumantes
           </span>
         </Link>
       </div>
